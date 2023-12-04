@@ -44,13 +44,29 @@ export const notifications: { key: string; notification: Notification | Notifica
     key: 'Basic',
     notification: {
       id: 'basic',
-      title: '<p style="color: #4caf50;"><b>Styled HTMLTitle</span></p></b></p> &#128576;',
+      title: 'Notification Title',
+      body: 'This is the body of notification',
       android: {
         channelId: 'high',
         pressAction: {
           id: 'default',
         },
         lights: [AndroidColor.PURPLE, 300, 600],
+        style: {
+          type: AndroidStyle.CUSTOM_VIEW,
+          picture:
+            'https://quickstart-2d03a500.myshopify.com/cdn/shop/products/Main_b13ad453-477c-4ed1-9b43-81f3345adfd6.jpg?v=1687848876&width=1646',
+          summary: 'This is the body of notification',
+        },
+        actions: [
+          {
+            pressAction: {
+              id: 'buy_now',
+              launchActivity: 'default',
+            },
+            title: 'Action',
+          },
+        ],
       },
       ios: {},
     },

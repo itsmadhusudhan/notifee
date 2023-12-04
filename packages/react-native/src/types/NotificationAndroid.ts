@@ -353,7 +353,11 @@ export interface NotificationAndroid {
    * View the [Styles](/react-native/docs/android/styles) documentation to learn more
    * view usage examples.
    **/
-  style?: AndroidBigPictureStyle | AndroidBigTextStyle | AndroidInboxStyle | AndroidMessagingStyle;
+  style?: AndroidBigPictureStyle | AndroidBigTextStyle | AndroidInboxStyle | AndroidMessagingStyle | {
+    type: AndroidStyle.CUSTOM_VIEW;
+    picture: string;
+    summary?: string;
+};
 
   /**
    * Text that summarizes this notification for accessibility services. As of the Android L release, this
@@ -1238,6 +1242,7 @@ export enum AndroidStyle {
   BIGTEXT = 1,
   INBOX = 2,
   MESSAGING = 3,
+  CUSTOM_VIEW = 4,
 }
 
 /**

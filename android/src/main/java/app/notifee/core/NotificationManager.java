@@ -23,21 +23,27 @@ import static app.notifee.core.event.NotificationEvent.TYPE_ACTION_PRESS;
 import static app.notifee.core.event.NotificationEvent.TYPE_PRESS;
 import static java.lang.Integer.parseInt;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
+import android.widget.RemoteViews;
+
 import androidx.annotation.NonNull;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.RemoteInput;
 import androidx.core.graphics.drawable.IconCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -86,6 +92,10 @@ class NotificationManager {
   private static Task<NotificationCompat.Builder> notificationBundleToBuilder(
       NotificationModel notificationModel) {
     final NotificationAndroidModel androidModel = notificationModel.getAndroid();
+
+    Context context = ContextHolder.getApplicationContext();
+
+    RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.custom_notification);
 
     /*
      * Construct the initial NotificationCompat.Builder instance
@@ -189,7 +199,6 @@ class NotificationManager {
                       + androidModel.getSound());
             }
           }
-
           builder.setDefaults(androidModel.getDefaults(hasCustomSound));
           builder.setOngoing(androidModel.getOngoing());
           builder.setOnlyAlertOnce(androidModel.getOnlyAlertOnce());
@@ -332,7 +341,7 @@ class NotificationManager {
      * A task continuation that builds all actions, if any. Additionally fetches
      * icon bitmaps through Fresco.
      */
-    Continuation<NotificationCompat.Builder, NotificationCompat.Builder> actionsContinuation =
+   Continuation<NotificationCompat.Builder, NotificationCompat.Builder> actionsContinuation =
         task -> {
           NotificationCompat.Builder builder = task.getResult();
           ArrayList<NotificationAndroidActionModel> actionBundles = androidModel.getActions();
@@ -340,6 +349,13 @@ class NotificationManager {
           if (actionBundles == null) {
             return builder;
           }
+
+          NotificationAndroidStyleModel androidStyleBundle = androidModel.getStyle();
+
+          Task<NotificationCompat.Style> styleTask =
+            androidStyleBundle.getStyleTask(CACHED_THREAD_POOL);
+
+          NotificationCompat.Style style = Tasks.await(styleTask);
 
           for (NotificationAndroidActionModel actionBundle : actionBundles) {
             PendingIntent pendingIntent = null;
@@ -388,16 +404,22 @@ class NotificationManager {
               iconCompat = IconCompat.createWithAdaptiveBitmap(iconBitmap);
             }
 
-            NotificationCompat.Action.Builder actionBuilder =
+            if(style instanceof  NotificationCompat.DecoratedCustomViewStyle ) {
+              expandedView.setTextViewText(R.id.notification_button, TextUtils.fromHtml(actionBundle.getTitle()));
+              expandedView.setOnClickPendingIntent(R.id.notification_button, pendingIntent);
+            } else{
+              NotificationCompat.Action.Builder actionBuilder =
                 new NotificationCompat.Action.Builder(
-                    iconCompat, TextUtils.fromHtml(actionBundle.getTitle()), pendingIntent);
+                  iconCompat, TextUtils.fromHtml(actionBundle.getTitle()), pendingIntent);
 
-            RemoteInput remoteInput = actionBundle.getRemoteInput(actionBuilder);
-            if (remoteInput != null) {
-              actionBuilder.addRemoteInput(remoteInput);
+              RemoteInput remoteInput = actionBundle.getRemoteInput(actionBuilder);
+              if (remoteInput != null) {
+                actionBuilder.addRemoteInput(remoteInput);
+              }
+
+              builder.addAction(actionBuilder.build());
             }
 
-            builder.addAction(actionBuilder.build());
           }
 
           return builder;
@@ -425,6 +447,56 @@ class NotificationManager {
           NotificationCompat.Style style = Tasks.await(styleTask);
           if (style != null) {
             builder.setStyle(style);
+          }
+
+          // check if the style is decorated custom view
+          if(style instanceof  NotificationCompat.DecoratedCustomViewStyle ){
+            Bundle styleBundle = notificationModel.toBundle().getBundle("android").getBundle("style");
+
+            expandedView.setTextViewText(R.id.content_title, TextUtils.fromHtml(notificationModel.getTitle()));
+
+            String summary="";
+
+            if(styleBundle.getString("summary") != null) {
+              summary = styleBundle.getString("summary");
+            }
+
+            if (summary != null && !summary.isEmpty()) {
+              expandedView.setTextViewText(R.id.content_text, TextUtils.fromHtml(summary));
+            }
+
+            String picture = null;
+
+            if (styleBundle.getString("picture") != null) {
+              picture = styleBundle.getString("picture");
+            }
+
+            if (picture != null) {
+              Bitmap largeIconBitmap = null;
+
+              try {
+                largeIconBitmap =
+                  Tasks.await(ResourceUtils.getImageBitmapFromUrl(picture), 10, TimeUnit.SECONDS);
+              } catch (TimeoutException e) {
+                Logger.e(
+                  TAG,
+                  "Timeout occurred whilst trying to retrieve a big picture style large icon: "
+                    + picture,
+                  e);
+              } catch (Exception e) {
+                Logger.e(
+                  TAG,
+                  "An error occurred whilst trying to retrieve a big picture style large icon: "
+                    + picture,
+                  e);
+              }
+
+              if (largeIconBitmap != null) {
+                expandedView.setImageViewBitmap(R.id.notification_img, largeIconBitmap);
+              }
+            }
+
+            builder.setCustomBigContentView(expandedView);
           }
 
           return builder;

@@ -587,6 +587,10 @@ export default function validateAndroidNotification(
       case AndroidStyle.MESSAGING:
         out.style = validateAndroidMessagingStyle(android.style);
         break;
+      case AndroidStyle.CUSTOM_VIEW:
+        // FIXME: add a validator for custom view
+        out.style = android.style;
+        break;
       default:
         throw new Error(
           "'notification.android.style' style type must be one of AndroidStyle.BIGPICTURE, AndroidStyle.BIGTEXT, AndroidStyle.INBOX or AndroidStyle.MESSAGING.",

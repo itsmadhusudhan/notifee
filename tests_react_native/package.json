@@ -5,7 +5,9 @@
   "scripts": {
     "build:clean": "rimraf dist && rimraf android/build && rimraf android/app/build && rimraf android/.gradle && rimraf ios/build",
     "prepare": "patch-package",
-    "send-pn": "node ./sendPushNotification.js"
+    "send-pn": "node ./sendPushNotification.js",
+    "android": "react-native run-android",
+    "start": "react-native start"
   },
   "dependencies": {
     "@notifee/react-native": "*",

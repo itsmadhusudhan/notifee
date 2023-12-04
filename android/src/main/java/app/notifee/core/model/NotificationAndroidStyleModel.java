@@ -130,6 +130,9 @@ public class NotificationAndroidStyleModel {
       case 3:
         styleTask = getMessagingStyleTask(executor);
         break;
+      case 4:
+        styleTask = Tasks.forResult(getDecoratedCustomViewStyle());
+        break;
     }
 
     return styleTask;
@@ -224,6 +227,10 @@ public class NotificationAndroidStyleModel {
 
           return bigPictureStyle;
         });
+  }
+
+  private NotificationCompat.Style getDecoratedCustomViewStyle() {
+    return new NotificationCompat.DecoratedCustomViewStyle();
   }
 
   /**
