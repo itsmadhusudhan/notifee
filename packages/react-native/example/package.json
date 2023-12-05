@@ -8,10 +8,10 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "postinstall": "cd node_modules/@notifee/react-native && yarn"
+    "postinstall": "cd node_modules/@kubric/notifee-react-native && yarn"
   },
   "dependencies": {
-    "@notifee/react-native": "7.8.0",
+    "@kubric/notifee-react-native": "7.9.0",
     "react": "18.2.0",
     "react-native": "0.71.4"
   },

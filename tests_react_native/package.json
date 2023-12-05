@@ -10,7 +10,7 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "@cirbuknotifee/react-native": "*",
+    "@kubric/notifee-react-native": "*",
     "@react-native-firebase/app": "^14.5.1",
     "@react-native-firebase/messaging": "^14.5.1",
     "cross-env": "^7.0.2",

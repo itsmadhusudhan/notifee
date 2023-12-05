@@ -1,6 +1,6 @@
 {
-  "name": "@cirbuknotifee/react-native",
-  "version": "7.9.0",
+  "name": "@kubric/notifee-react-native",
+  "version": "7.10.0",
   "author": "Invertase <oss@invertase.io> (http://invertase.io)",
   "description": "Notifee - a feature rich notifications library for React Native.",
   "main": "dist/index.js",
@@ -52,6 +52,6 @@
     "onesignal"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   }
 }
