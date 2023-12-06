@@ -45,7 +45,7 @@ export const notifications: { key: string; notification: Notification | Notifica
     notification: {
       id: 'basic',
       title: 'Notification Title',
-      body: 'This is the body of notification',
+      body: 'This is the body of notification custom view',
       android: {
         channelId: 'high',
         pressAction: {
@@ -55,7 +55,7 @@ export const notifications: { key: string; notification: Notification | Notifica
         style: {
           type: AndroidStyle.CUSTOM_VIEW,
           picture:
-            'https://quickstart-2d03a500.myshopify.com/cdn/shop/products/Main_b13ad453-477c-4ed1-9b43-81f3345adfd6.jpg?v=1687848876&width=1646',
+            'https://quickstart-2d03a500.myshopify.com/cdn/shop/products/Main_b13ad453-477c-4ed1-9b43-81f3345adfd6.jpg?v=1687848876&width=200',
           summary: 'This is the body of notification',
         },
         actions: [

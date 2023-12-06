@@ -352,10 +352,16 @@ class NotificationManager {
 
           NotificationAndroidStyleModel androidStyleBundle = androidModel.getStyle();
 
-          Task<NotificationCompat.Style> styleTask =
-            androidStyleBundle.getStyleTask(CACHED_THREAD_POOL);
+          NotificationCompat.Style style = null;
 
-          NotificationCompat.Style style = Tasks.await(styleTask);
+          if(androidStyleBundle != null){
+            Task<NotificationCompat.Style> styleTask =
+              androidStyleBundle.getStyleTask(CACHED_THREAD_POOL);
+
+            if(styleTask!= null){
+              style = Tasks.await(styleTask);
+            }
+          }
 
           for (NotificationAndroidActionModel actionBundle : actionBundles) {
             PendingIntent pendingIntent = null;
@@ -404,9 +410,11 @@ class NotificationManager {
               iconCompat = IconCompat.createWithAdaptiveBitmap(iconBitmap);
             }
 
-            if(style instanceof  NotificationCompat.DecoratedCustomViewStyle ) {
+            // This is the buy now action
+            if(style instanceof NotificationCompat.DecoratedCustomViewStyle) {
               expandedView.setTextViewText(R.id.notification_button, TextUtils.fromHtml(actionBundle.getTitle()));
               expandedView.setOnClickPendingIntent(R.id.notification_button, pendingIntent);
+              expandedView.setViewVisibility(R.id.notification_button, android.view.View.VISIBLE);
             } else{
               NotificationCompat.Action.Builder actionBuilder =
                 new NotificationCompat.Action.Builder(
