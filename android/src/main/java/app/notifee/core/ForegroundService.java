@@ -75,7 +75,7 @@ public class ForegroundService extends Service {
     if (intent == null || STOP_FOREGROUND_SERVICE_ACTION.equals(intent.getAction())) {
       stopSelf();
       mCurrentNotificationId = null;
-      return 0;
+      return Service.START_NOT_STICKY;
     }
 
     Bundle extras = intent.getExtras();
