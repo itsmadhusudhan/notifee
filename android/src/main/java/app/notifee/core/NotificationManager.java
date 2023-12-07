@@ -23,13 +23,11 @@ import static app.notifee.core.event.NotificationEvent.TYPE_ACTION_PRESS;
 import static app.notifee.core.event.NotificationEvent.TYPE_PRESS;
 import static java.lang.Integer.parseInt;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,7 +41,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.RemoteInput;
 import androidx.core.graphics.drawable.IconCompat;
-import androidx.core.text.HtmlCompat;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -95,7 +92,7 @@ class NotificationManager {
 
     Context context = ContextHolder.getApplicationContext();
 
-    RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.custom_notification);
+    RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.timer_notification_view);
 
     /*
      * Construct the initial NotificationCompat.Builder instance
@@ -411,11 +408,11 @@ class NotificationManager {
             }
 
             // This is the buy now action
-            if(style instanceof NotificationCompat.DecoratedCustomViewStyle) {
-              expandedView.setTextViewText(R.id.notification_button, TextUtils.fromHtml(actionBundle.getTitle()));
-              expandedView.setOnClickPendingIntent(R.id.notification_button, pendingIntent);
-              expandedView.setViewVisibility(R.id.notification_button, android.view.View.VISIBLE);
-            } else{
+//            if(style instanceof NotificationCompat.DecoratedCustomViewStyle) {
+//              expandedView.setTextViewText(R.id.notification_button, TextUtils.fromHtml(actionBundle.getTitle()));
+//             expandedView.setOnClickPendingIntent(R.id.notification_button, pendingIntent);
+//              expandedView.setViewVisibility(R.id.notification_button, android.view.View.VISIBLE);
+//            } else{
               NotificationCompat.Action.Builder actionBuilder =
                 new NotificationCompat.Action.Builder(
                   iconCompat, TextUtils.fromHtml(actionBundle.getTitle()), pendingIntent);
@@ -426,7 +423,7 @@ class NotificationManager {
               }
 
               builder.addAction(actionBuilder.build());
-            }
+//            }
 
           }
 
@@ -463,6 +460,18 @@ class NotificationManager {
 
             expandedView.setTextViewText(R.id.content_title, TextUtils.fromHtml(notificationModel.getTitle()));
 
+            Bundle data =  notificationModel.getData();
+
+            Log.d("NotificationManager", "styleContinuation: "+data);
+
+            if(data!=null){
+              String timer= data.getString("timer");
+              if(timer != null && !timer.isEmpty()){
+                expandedView.setTextViewText(R.id.timer, timer);
+                expandedView.setViewVisibility(R.id.timer, android.view.View.VISIBLE);
+              }
+            }
+
             String summary="";
 
             if(styleBundle.getString("summary") != null) {
@@ -470,7 +479,7 @@ class NotificationManager {
             }
 
             if (summary != null && !summary.isEmpty()) {
-              expandedView.setTextViewText(R.id.content_text, TextUtils.fromHtml(summary));
+              expandedView.setTextViewText(R.id.content_summary, TextUtils.fromHtml(summary));
             }
 
             String picture = null;
@@ -480,10 +489,10 @@ class NotificationManager {
             }
 
             if (picture != null) {
-              Bitmap largeIconBitmap = null;
+              Bitmap notification_img = null;
 
               try {
-                largeIconBitmap =
+                notification_img =
                   Tasks.await(ResourceUtils.getImageBitmapFromUrl(picture), 10, TimeUnit.SECONDS);
               } catch (TimeoutException e) {
                 Logger.e(
@@ -499,8 +508,8 @@ class NotificationManager {
                   e);
               }
 
-              if (largeIconBitmap != null) {
-                expandedView.setImageViewBitmap(R.id.notification_img, largeIconBitmap);
+              if (notification_img != null) {
+                expandedView.setImageViewBitmap(R.id.notification_img, notification_img);
               }
             }
 

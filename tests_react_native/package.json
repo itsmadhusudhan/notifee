@@ -7,7 +7,7 @@
     "prepare": "patch-package",
     "send-pn": "node ./sendPushNotification.js",
     "android": "react-native run-android",
-    "start": "react-native start"
+    "start": "export NODE_OPTIONS='--openssl-legacy-provider'; react-native start"
   },
   "dependencies": {
     "@kubric/notifee-react-native": "*",
