@@ -93,6 +93,7 @@ class NotificationManager {
     Context context = ContextHolder.getApplicationContext();
 
     RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.timer_notification_view);
+    RemoteViews collapsedView = new RemoteViews(context.getPackageName(), R.layout.timer_collapsed_view);
 
     /*
      * Construct the initial NotificationCompat.Builder instance
@@ -459,6 +460,8 @@ class NotificationManager {
             Bundle styleBundle = notificationModel.toBundle().getBundle("android").getBundle("style");
 
             expandedView.setTextViewText(R.id.content_title, TextUtils.fromHtml(notificationModel.getTitle()));
+            collapsedView.setTextViewText(R.id.short_title, TextUtils.fromHtml(notificationModel.getTitle()));
+            collapsedView.setTextViewText(R.id.short_body, TextUtils.fromHtml(notificationModel.getBody()));
 
             Bundle data =  notificationModel.getData();
 
@@ -469,6 +472,9 @@ class NotificationManager {
               if(timer != null && !timer.isEmpty()){
                 expandedView.setTextViewText(R.id.timer, timer);
                 expandedView.setViewVisibility(R.id.timer, android.view.View.VISIBLE);
+
+                collapsedView.setTextViewText(R.id.timer, timer);
+                collapsedView.setViewVisibility(R.id.timer, android.view.View.VISIBLE);
               }
             }
 
@@ -514,6 +520,7 @@ class NotificationManager {
             }
 
             builder.setCustomBigContentView(expandedView);
+            builder.setCustomContentView(collapsedView);
           }
 
           return builder;
