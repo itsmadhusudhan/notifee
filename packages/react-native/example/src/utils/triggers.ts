@@ -4,7 +4,7 @@ import {
   IntervalTrigger,
   TimeUnit,
   RepeatFrequency,
-} from '@notifee/react-native';
+} from '@kubric/notifee-react-native';
 
 type TriggersItems = {
   timestamp: () => TimestampTrigger;

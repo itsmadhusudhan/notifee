@@ -1,4 +1,4 @@
-import {IOSNotificationCategory} from '@notifee/react-native';
+import {IOSNotificationCategory} from '@kubric/notifee-react-native';
 
 export const categories: IOSNotificationCategory[] = [
   {

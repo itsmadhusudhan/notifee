@@ -6,7 +6,7 @@ import {
   AndroidImportance,
   AndroidFlags,
   AndroidColor,
-} from '@notifee/react-native';
+} from '@kubric/notifee-react-native';
 
 export const notifications: { key: string; notification: Notification | Notification[] }[] = [
   {
@@ -44,9 +44,10 @@ export const notifications: { key: string; notification: Notification | Notifica
     key: 'Basic',
     notification: {
       id: 'basic',
-      title: 'Notification Title',
-      body: 'This is the body of notification custom view',
+      title: 'Baby Shirt',
+      body: 'Baby Shirt is here',
       android: {
+        // asForegroundService: true,
         channelId: 'high',
         pressAction: {
           id: 'default',
@@ -55,8 +56,9 @@ export const notifications: { key: string; notification: Notification | Notifica
         style: {
           type: AndroidStyle.CUSTOM_VIEW,
           picture:
-            'https://quickstart-2d03a500.myshopify.com/cdn/shop/products/Main_b13ad453-477c-4ed1-9b43-81f3345adfd6.jpg?v=1687848876&width=200',
-          summary: 'This is the body of notification',
+            'https://quickstart-2d03a500.myshopify.com/cdn/shop/products/Main_b13ad453-477c-4ed1-9b43-81f3345adfd6.jpg?v=1687848876&width=300',
+          // summary: 'This is the body of notification',
+          summary: `<p style="color:#FF2E98">OFFER ENDS SOON</p> Price: <span style="text-decoration:line-through">₹200</span> <span>₹150</span>`,
         },
         actions: [
           {
@@ -69,6 +71,9 @@ export const notifications: { key: string; notification: Notification | Notifica
         ],
       },
       ios: {},
+      data: {
+        timer: '20:00:10',
+      },
     },
   },
   {

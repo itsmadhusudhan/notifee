@@ -26,7 +26,7 @@ import Notifee, {
   AuthorizationStatus,
   TimestampTrigger,
   RepeatFrequency,
-} from '@notifee/react-native';
+} from '@kubric/notifee-react-native';
 
 import { notifications } from './notifications';
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -369,9 +369,9 @@ function logEvent(state: string, event: any): void {
   console.warn(JSON.stringify(event));
 }
 
-Notifee.onForegroundEvent(event => {
-  logEvent('Foreground', event);
-});
+// Notifee.onForegroundEvent(event => {
+//   logEvent('Foreground', event);
+// });
 
 Notifee.onBackgroundEvent(async ({ type, detail }) => {
   console.log('onBackgroundEvent');
@@ -390,56 +390,56 @@ Notifee.onBackgroundEvent(async ({ type, detail }) => {
   }
 });
 
-Notifee.registerForegroundService(notification => {
-  console.warn('Foreground service started.', notification);
-  return new Promise(resolve => {
-    /**
-     * Cancel the notification and resolve the service promise so the Headless task quits.
-     */
-    async function stopService(id?: string): Promise<void> {
-      console.warn('Stopping service, using notification id: ' + id);
-      clearInterval(interval);
-      if (id) {
-        await Notifee.cancelNotification(id);
-      }
-      return resolve();
-    }
+// Notifee.registerForegroundService(notification => {
+//   console.warn('Foreground service started.', notification);
+//   return new Promise(resolve => {
+//     /**
+//      * Cancel the notification and resolve the service promise so the Headless task quits.
+//      */
+//     async function stopService(id?: string): Promise<void> {
+//       console.warn('Stopping service, using notification id: ' + id);
+//       clearInterval(interval);
+//       if (id) {
+//         await Notifee.cancelNotification(id);
+//       }
+//       return resolve();
+//     }
 
-    /**
-     * Cancel our long running task if the user presses the 'stop' action.
-     */
-    async function handleStopActionEvent({ type, detail }: Event): Promise<void> {
-      console.log('handleStopActionEvent1 type:', type, 'pressactionid', detail?.pressAction?.id);
+//     /**
+//      * Cancel our long running task if the user presses the 'stop' action.
+//      */
+//     async function handleStopActionEvent({ type, detail }: Event): Promise<void> {
+//       console.log('handleStopActionEvent1 type:', type, 'pressactionid', detail?.pressAction?.id);
 
-      if (type !== EventType.ACTION_PRESS) return;
-      console.log('handleStopActionEvent2 type:', type, 'pressactionid', detail?.pressAction?.id);
+//       if (type !== EventType.ACTION_PRESS) return;
+//       console.log('handleStopActionEvent2 type:', type, 'pressactionid', detail?.pressAction?.id);
 
-      if (detail?.pressAction?.id === 'stop') {
-        console.warn('Stop action was pressed');
-        await stopService(detail.notification?.id);
-      }
-    }
+//       if (detail?.pressAction?.id === 'stop') {
+//         console.warn('Stop action was pressed');
+//         await stopService(detail.notification?.id);
+//       }
+//     }
 
-    Notifee.onForegroundEvent(handleStopActionEvent);
-    Notifee.onBackgroundEvent(handleStopActionEvent);
+//     Notifee.onForegroundEvent(handleStopActionEvent);
+//     Notifee.onBackgroundEvent(handleStopActionEvent);
 
-    // A fake progress updater.
-    let current = 1;
-    const interval = setInterval(async () => {
-      notification.android = {
-        progress: { current: current },
-      };
-      Notifee.displayNotification(notification);
-      current++;
-    }, 125);
+//     // A fake progress updater.
+//     let current = 1;
+//     const interval = setInterval(async () => {
+//       notification.android = {
+//         progress: { current: current },
+//       };
+//       Notifee.displayNotification(notification);
+//       current++;
+//     }, 125);
 
-    setTimeout(async () => {
-      clearInterval(interval);
-      console.warn('Background work has completed.');
-      await stopService(notification.id);
-    }, 15000);
-  });
-});
+//     setTimeout(async () => {
+//       clearInterval(interval);
+//       console.warn('Background work has completed.');
+//       await stopService(notification.id);
+//     }, 15000);
+//   });
+// });
 
 const styles = StyleSheet.create({
   container: {

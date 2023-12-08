@@ -4,7 +4,7 @@ import {
   AndroidStyle,
   AndroidVisibility,
   Notification,
-} from '@notifee/react-native';
+} from '@kubric/notifee-react-native';
 
 type NotificationItems = {
   basic: Notification;
