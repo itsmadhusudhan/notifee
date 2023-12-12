@@ -32,7 +32,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -85,6 +87,13 @@ class NotificationManager {
   private static final int NOTIFICATION_TYPE_ALL = 0;
   private static final int NOTIFICATION_TYPE_DISPLAYED = 1;
   private static final int NOTIFICATION_TYPE_TRIGGER = 2;
+
+  private static int getScreenWidth(){
+    DisplayMetrics displayMetrics = new DisplayMetrics();
+    WindowManager windowmanager = (WindowManager) ContextHolder.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+    windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
+    return displayMetrics.widthPixels;
+  }
 
   private static Task<NotificationCompat.Builder> notificationBundleToBuilder(
       NotificationModel notificationModel) {
@@ -480,7 +489,7 @@ class NotificationManager {
 
             String summary="";
 
-            if(styleBundle.getString("summary") != null) {
+            if(styleBundle !=null && styleBundle.getString("summary") != null) {
               summary = styleBundle.getString("summary");
             }
 
@@ -490,7 +499,7 @@ class NotificationManager {
 
             String picture = null;
 
-            if (styleBundle.getString("picture") != null) {
+            if (styleBundle !=null && styleBundle.getString("picture") != null) {
               picture = styleBundle.getString("picture");
             }
 
@@ -503,19 +512,36 @@ class NotificationManager {
               } catch (TimeoutException e) {
                 Logger.e(
                   TAG,
-                  "Timeout occurred whilst trying to retrieve a big picture style large icon: "
+                  "Timeout occurred whilst trying to retrieve a big picture style: "
                     + picture,
                   e);
               } catch (Exception e) {
                 Logger.e(
                   TAG,
-                  "An error occurred whilst trying to retrieve a big picture style large icon: "
+                  "An error occurred whilst trying to retrieve a big picture style: "
                     + picture,
                   e);
               }
 
               if (notification_img != null) {
-                expandedView.setImageViewBitmap(R.id.notification_img, notification_img);
+                int width= getScreenWidth();
+                int imageWidth = notification_img.getWidth();
+                int imageHeight = notification_img.getHeight();
+
+                Log.d("NotificationManager", "imageWidth: "+imageWidth + " imageHeight: "+imageHeight + " width: "+width);
+
+                float aspectRatio = imageWidth/
+                  (float) imageHeight;
+
+                int height = Math.round(width / aspectRatio);
+
+                Log.d("NotificationManager", "height: "+height + " width: "+width + " aspectRatio: "+aspectRatio);
+
+                Bitmap resizedBitmap = Bitmap.createScaledBitmap(
+                  notification_img, width, height, false);
+
+
+                expandedView.setImageViewBitmap(R.id.notification_img, resizedBitmap);
               }
             }
 

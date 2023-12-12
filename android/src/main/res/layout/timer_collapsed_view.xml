@@ -5,7 +5,7 @@
   android:layout_height="match_parent"
   >
   <LinearLayout
-    android:layout_width="wrap_content"
+    android:layout_width="0dp"
     android:layout_height="match_parent"
     android:layout_marginEnd="20dp"
     android:orientation="vertical"
@@ -15,12 +15,15 @@
       android:id="@+id/short_title"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:textFontWeight="700"
+      android:ellipsize="end"
+      android:singleLine="true"
+      style="@style/TextAppearance.Compat.Notification.Title"
       />
     <TextView
       android:id="@+id/short_body"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      style="@style/TextAppearance.Compat.Notification.Info"
       />
   </LinearLayout>
   <TextView

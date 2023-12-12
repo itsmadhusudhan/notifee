@@ -418,7 +418,7 @@ export interface Module {
    * permission was granted, check the `authorizationStatus` property in the response:
    *
    * ```js
-   * import notifee, { AuthorizationStatus } from '@notifee/react-native';
+   * import notifee, { AuthorizationStatus } from '@kubric/notifee-react-native';
    *
    * const settings = await notifee.requestPermission(...);
    *
@@ -542,7 +542,7 @@ export interface Module {
    * View the [Background Restrictions](/react-native/docs/android/background-restrictions) documentation for more information.
    *
    * ```js
-   * import notifee from `@notifee/react-native`;
+   * import notifee from `@kubric/notifee-react-native`;
    *
    * const powerManagerInfo = await notifee.getPowerManagerInfo();
    *
@@ -567,7 +567,7 @@ export interface Module {
    * View the [Background Restrictions](/react-native/docs/android/background-restrictions) documentation for more information.
    *
    * ```js
-   * import notifee from `@notifee/react-native`;
+   * import notifee from `@kubric/notifee-react-native`;
    *
    * const powerManagerInfo = await notifee.getPowerManagerInfo
    *
@@ -596,7 +596,7 @@ export interface Module {
    * ```
    *
    * ```js
-   * import notifee from `@notifee/react-native`;
+   * import notifee from `@kubric/notifee-react-native`;
    *
    * notifee.hideNotificationDrawer();
    * ```
@@ -607,10 +607,10 @@ export interface Module {
 }
 
 /**
- * Interface describing the static properties available on the default `@notifee/react-native` export.
+ * Interface describing the static properties available on the default `@kubric/notifee-react-native` export.
  *
  * ```js
- * import notifee from `@notifee/react-native`;
+ * import notifee from `@kubric/notifee-react-native`;
  *
  * console.log(notifee.SDK_VERSION);
  * ```

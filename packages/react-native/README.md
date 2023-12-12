@@ -14,7 +14,7 @@ A feature rich Android & iOS notifications library for React Native.
 ## Installation
 
 ```bash
-yarn add @notifee/react-native
+yarn add @kubric/notifee-react-native
 ```
 
 ## Documentation
@@ -80,7 +80,7 @@ setupFiles: ['<rootDir>/jest.setup.js'],
 You can then add the following line to that setup file to mock `notifee`:
 
 ```js
-jest.mock('@notifee/react-native', () => require('@notifee/react-native/jest-mock'))
+jest.mock('@kubric/notifee-react-native', () => require('@kubric/notifee-react-native/jest-mock'))
 ```
 
 You will also need to add `@notifee` to `transformIgnorePatterns` in your config file (`jest.config.js`):

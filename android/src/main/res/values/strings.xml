@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Notifee Core</string>
+    <string name="notification_image_description">Notification Image</string>
 </resources>
