@@ -28,9 +28,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.service.notification.StatusBarNotification;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -42,6 +44,7 @@ import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.RemoteInput;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.drawable.IconCompat;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -70,6 +73,14 @@ import app.notifee.core.utility.TextUtils;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -78,6 +89,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 
 class NotificationManager {
   private static final String TAG = "NotificationManager";
@@ -88,11 +100,59 @@ class NotificationManager {
   private static final int NOTIFICATION_TYPE_DISPLAYED = 1;
   private static final int NOTIFICATION_TYPE_TRIGGER = 2;
 
+    public static Uri saveImageToStorage(Context context, Bitmap bitmap, String imageName) {
+      File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+      File imageFile = new File(storageDir, imageName + ".jpg");
+
+      if (imageFile.exists()) {
+        return FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName()+".fileprovider", imageFile);
+      }
+
+      try (FileOutputStream out = new FileOutputStream(imageFile)) {
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      return FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName()+".fileprovider", imageFile);
+    }
+
   private static int getScreenWidth(){
     DisplayMetrics displayMetrics = new DisplayMetrics();
     WindowManager windowmanager = (WindowManager) ContextHolder.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
     windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
     return displayMetrics.widthPixels;
+  }
+
+  public static Bitmap compressBitmapFromUrl(String urlString,  int quality) {
+    Bitmap bitmap = null;
+    try {
+      URL url = new URL(urlString);
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setDoInput(true);
+      connection.connect();
+
+      String contentType = connection.getContentType();
+      Bitmap.CompressFormat format= Bitmap.CompressFormat.JPEG;
+
+      if (contentType != null) {
+       if (contentType.contains("png")) {
+          format = Bitmap.CompressFormat.PNG;
+        }
+      }
+
+      InputStream input = connection.getInputStream();
+      bitmap = BitmapFactory.decodeStream(input);
+
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      bitmap.compress(format, quality, outputStream);
+      byte[] compressedBitmapBytes = outputStream.toByteArray();
+
+      // Convert the compressed bytes back to a Bitmap
+      bitmap = BitmapFactory.decodeByteArray(compressedBitmapBytes, 0, compressedBitmapBytes.length);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return bitmap;
   }
 
   private static Task<NotificationCompat.Builder> notificationBundleToBuilder(
@@ -509,13 +569,19 @@ class NotificationManager {
               try {
                 notification_img =
                   Tasks.await(ResourceUtils.getImageBitmapFromUrl(picture), 10, TimeUnit.SECONDS);
-              } catch (TimeoutException e) {
+                Uri imageUri = saveImageToStorage(context, notification_img,notificationModel.getId());
+                expandedView.setImageViewUri(R.id.notification_img, imageUri);
+                Log.d("NotificationManager", "styleContinuation: "+imageUri);
+//                notification_img= compressBitmapFromUrl(picture, 100);
+              }
+              catch (TimeoutException e) {
                 Logger.e(
                   TAG,
                   "Timeout occurred whilst trying to retrieve a big picture style: "
                     + picture,
                   e);
-              } catch (Exception e) {
+              }
+              catch (Exception e) {
                 Logger.e(
                   TAG,
                   "An error occurred whilst trying to retrieve a big picture style: "
@@ -524,24 +590,27 @@ class NotificationManager {
               }
 
               if (notification_img != null) {
-                int width= getScreenWidth();
-                int imageWidth = notification_img.getWidth();
-                int imageHeight = notification_img.getHeight();
+//                int width= getScreenWidth();
+//                int imageWidth = notification_img.getWidth();
+//                int imageHeight = notification_img.getHeight();
+//
+//                Log.d("NotificationManager", "imageWidth: "+imageWidth + " imageHeight: "+imageHeight + " width: "+width);
+//
+//                float aspectRatio = imageWidth/
+//                  (float) imageHeight;
+//
+//                int height = Math.round(width / aspectRatio);
+//
+//                Log.d("NotificationManager", "height: "+height + " width: "+width + " aspectRatio: "+aspectRatio);
+//
+//
+//
+//                Bitmap resizedBitmap = Bitmap.createScaledBitmap(
+//                  notification_img, width, height, false);
 
-                Log.d("NotificationManager", "imageWidth: "+imageWidth + " imageHeight: "+imageHeight + " width: "+width);
-
-                float aspectRatio = imageWidth/
-                  (float) imageHeight;
-
-                int height = Math.round(width / aspectRatio);
-
-                Log.d("NotificationManager", "height: "+height + " width: "+width + " aspectRatio: "+aspectRatio);
-
-                Bitmap resizedBitmap = Bitmap.createScaledBitmap(
-                  notification_img, width, height, false);
 
 
-                expandedView.setImageViewBitmap(R.id.notification_img, resizedBitmap);
+//                expandedView.setImageViewBitmap(R.id.notification_img, resizedBitmap);
               }
             }
 
