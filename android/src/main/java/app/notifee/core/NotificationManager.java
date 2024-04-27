@@ -104,15 +104,14 @@ class NotificationManager {
       File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
       File imageFile = new File(storageDir, imageName + ".jpg");
 
-      if (imageFile.exists()) {
-        return FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName()+".fileprovider", imageFile);
+      if (!imageFile.exists()) {
+        try (FileOutputStream out = new FileOutputStream(imageFile)) {
+          bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
 
-      try (FileOutputStream out = new FileOutputStream(imageFile)) {
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
       return FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName()+".fileprovider", imageFile);
     }
 
